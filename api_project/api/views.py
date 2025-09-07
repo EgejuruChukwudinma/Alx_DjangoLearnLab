@@ -1,21 +1,21 @@
-from rest_framework import generics, viewsets
+from rest_framework import generics, viewsets, permissions
 from .models import Book
 from .serializers import BookSerializer
+
+class IsAuthenticatedOrReadOnly(permissions.IsAuthenticatedOrReadOnly):
+    """
+    Read: anyone; Write: authenticated users.
+    (Built-in class; shown here for clarity.)
+    """
+    pass
 
 class BookList(generics.ListAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
+    permission_classes = [permissions.AllowAny]  # keep the list endpoint open if desired
 
 class BookViewSet(viewsets.ModelViewSet):
-    """
-    Full CRUD for Book:
-    - list (GET /books_all/)
-    - retrieve (GET /books_all/<id>/)
-    - create (POST /books_all/)
-    - update (PUT /books_all/<id>/)
-    - partial_update (PATCH /books_all/<id>/)
-    - destroy (DELETE /books_all/<id>/)
-    """
     queryset = Book.objects.all()
     serializer_class = BookSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
